@@ -1,70 +1,70 @@
-# Sistema d'Anàlisi de Tràfic en Cruïlla
+# Intersection Traffic Analysis System
 
-Aquest projecte implementa un sistema complet de visió per computador per a l'anàlisi de tràfic en cruïlles utilitzant models d'última generació.
+This project implements a complete computer vision system for traffic analysis at intersections using state-of-the-art models.
 
-## 🏗️ Arquitectura
+## 🏗️ Architecture
 
-- **Detecció**: YOLOv8 (detecta vehicles i vianants).
-- **Seguiment (Tracking)**: ByteTrack (associa deteccions temporalment).
-- **Assignació de Carrils**: Carrils virtuals definits per polígons i assignació basada en geometria.
-- **Detecció d'Anomalies**:
-    - Excés de velocitat.
-    - Trajectòries inusuals (clustering).
-    - Vianants a la calçada.
+- **Detection**: YOLOv8 (detects vehicles and pedestrians).
+- **Tracking**: ByteTrack (associates detections temporally).
+- **Lane Assignment**: Virtual lanes defined by polygons and geometry-based assignment.
+- **Anomaly Detection**:
+    - Speeding.
+    - Unusual trajectories (clustering).
+    - Pedestrians on the road.
 
-## 🚀 Instal·lació
+## 🚀 Installation
 
-1.  Clonar el repositori:
+1.  Clone the repository:
     ```bash
     git clone https://github.com/Roger0432/CV-Project.git
     cd CV-Project
     ```
 
-2.  Crear un entorn virtual (opcional però recomanat):
+2.  Create a virtual environment (optional but recommended):
     ```bash
     python -m venv venv
     .\venv\Scripts\activate  # Windows
     # source venv/bin/activate # Linux/Mac
     ```
 
-3.  Instal·lar dependències:
+3.  Install dependencies:
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  Descarregar un vídeo del dataset UA-DETRAC (o utilitzar-ne un de propi) i guardar-lo a la carpeta `data/`.
+4.  Download a video from the UA-DETRAC dataset (or use your own) and save it to the `data/` folder.
 
-## ⚙️ Configuració
+## ⚙️ Configuration
 
-Pots ajustar els paràmetres del sistema a `utils/config.py`:
-- `VIDEO_PATH`: Ruta al vídeo d'entrada.
-- `CAMERA_CALIBRATION_FACTOR`: Metres per píxel (calibrar segons la càmera).
-- `LANE_POLYGONS`: Coordenades dels polígons dels carrils virtuals.
-- `SPEED_THRESHOLD`: Límit per detectar excés de velocitat (km/h).
+You can adjust the system parameters in `utils/config.py`:
+- `VIDEO_PATH`: Path to the input video.
+- `CAMERA_CALIBRATION_FACTOR`: Meters per pixel (calibrate according to the camera).
+- `LANE_POLYGONS`: Coordinates of the virtual lane polygons.
+- `SPEED_THRESHOLD`: Limit for detecting speeding (km/h).
 
-## ▶️ Execució
+## ▶️ Execution
 
-Per executar el pipeline complet d'anàlisi:
+To run the complete analysis pipeline:
 
 ```bash
 python src/main.py
 ```
 
-## 📊 Resultats
+## 📊 Results
 
-Els resultats es guardaran a:
-- `results/output_video.mp4`: Vídeo processat amb visualitzacions.
-- `results/tracking_data.json`: Dades de trajectòries estructurades.
-- `results/anomalies.csv`: Registre d'anomalies detectades.
+Results will be saved to:
+- `results/output_video.mp4`: Processed video with visualizations.
+- `results/tracking_data.json`: Structured trajectory data.
+- `results/anomalies.csv`: Record of detected anomalies.
 
-## 🛠️ Estructura de Directoris
+## 🛠️ Directory Structure
 
 ```
 CV-Project/
-├── data/           # Vídeos d'entrada
-├── results/        # Sortides generades
-├── src/            # Codi font dels mòduls
-├── utils/          # Utilitats i configuració
+├── data/           # Input videos
+├── results/        # Generated outputs
+├── src/            # Source code modules
+├── utils/          # Utilities and configuration
 ├── requirements.txt
 └── README.md
 ```
