@@ -1,0 +1,14 @@
+ultralytics>=8.0.0
+torch
+torchvision
+torchaudio
+opencv-python
+supervision
+scikit-learn
+numpy
+pandas
+matplotlib
+tqdm
+filterpy
+lap
+shapely

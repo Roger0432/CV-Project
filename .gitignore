@@ -1,0 +1,12 @@
+# Entorn virtual
+venv/
+.venv/
+
+# Fitxers Python compilats
+__pycache__/
+*.pyc
+
+# Carpetes de build
+build/
+dist/
+*.egg-info/
