@@ -1,4 +1,6 @@
 import numpy as np
+import cv2
+from shapely.geometry import Point, Polygon
 from collections import deque
 from utils import config
 
@@ -9,6 +11,10 @@ class AnomalyDetector:
         """
         # Store recent positions to calculate speed: {track_id: deque([(x, y), ...])}
         self.track_history = {} 
+        
+        self.forbidden_zones = {}
+        for zone_id, poly_coords in config.FORBIDDEN_ZONES.items():
+            self.forbidden_zones[zone_id] = Polygon(poly_coords) 
 
     def analyze(self, detections, lane_assignments):
         """
@@ -62,29 +68,41 @@ class AnomalyDetector:
                         'bbox': bbox
                     })
 
-            # --- 3. Unusual Trajectory (Simplified) ---
-            # Ideally requires full trajectory analysis post-processing or a trained model.
-            # Here we could check for driving wrong way if we defined lane directions.
+            # --- 3. Forbidden Zones ---
+            # Check if vehicle center is in a forbidden zone
+            # (pedestrians or cars)
+            point = Point(center_x, y2) # Use bottom center (feet)
+            for zone_id, poly in self.forbidden_zones.items():
+                if poly.contains(point):
+                     anomalies.append({
+                        'type': 'FORBIDDEN_ZONE',
+                        'id': tid,
+                        'value': f"Zone {zone_id}",
+                        'bbox': bbox
+                    })
             
         return anomalies
 
     def _calculate_speed(self, tid):
         """
-        Calculates speed in km/h based on pixel displacement.
+        Calculates speed in km/h based on pixel displacement or homography.
         """
         history = self.track_history[tid]
         if len(history) < 2:
             return 0.0
         
-        # Calculate distance between first and last point in the window
-        # (Using simple Euclidean distance, better would be sum of segments if window is large)
         start_pos = np.array(history[0])
         end_pos = np.array(history[-1])
         
-        pixel_dist = np.linalg.norm(end_pos - start_pos)
-        
-        # Convert to real world distance
-        meters_dist = pixel_dist * config.CAMERA_CALIBRATION_FACTOR
+        if config.HOMOGRAPHY_MATRIX is not None:
+            # Convert pixels to world coordinates
+            start_world = self._apply_homography(start_pos, config.HOMOGRAPHY_MATRIX)
+            end_world = self._apply_homography(end_pos, config.HOMOGRAPHY_MATRIX)
+            meters_dist = np.linalg.norm(end_world - start_world)
+        else:
+            # Fallback: simple Scaling
+            pixel_dist = np.linalg.norm(end_pos - start_pos)
+            meters_dist = pixel_dist * config.CAMERA_CALIBRATION_FACTOR
         
         # Time elapsed
         frames_elapsed = len(history) - 1
@@ -97,3 +115,18 @@ class AnomalyDetector:
         speed_kmh = speed_mps * 3.6
         
         return speed_kmh
+
+    def _apply_homography(self, point, H):
+        """
+        Applies homography matrix to a 2D point (x, y).
+        """
+        # Convert to homogenous coordinate [x, y, 1]
+        p = np.array([point[0], point[1], 1]).reshape(3, 1)
+        # Apply matrix
+        new_p = np.dot(H, p)
+        # Normalize by z (scale)
+        if new_p[2] != 0:
+            x = new_p[0] / new_p[2]
+            y = new_p[1] / new_p[2]
+            return np.array([x, y]).flatten()
+        return np.array([0, 0])

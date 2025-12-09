@@ -52,6 +52,17 @@ SPEED_THRESHOLD = 50.0 # km/h
 SPEED_HISTORY_WINDOW = 5 # Number of frames to average speed
 TRAJECTORY_DEVIATION_SIGMA = 2.0 # Standard deviations for clustering outlier detection
 
+# Polygons where vehicles should NOT be (e.g. sidewalks, central islands)
+# Similar format to LANE_POLYGONS
+FORBIDDEN_ZONES = {
+    # 1: np.array([[x1, y1], [x2, y2], ...]),
+}
+
+# Homography Matrix (3x3) for Pixel -> Real World mapping
+# If None, uses calibration factor
+HOMOGRAPHY_MATRIX = None 
+# HOMOGRAPHY_MATRIX = np.array([...])
+
 # --- VISUALIZATION ---
 DRAW_TRAJECTORIES = True
 DRAW_LANES = True
