@@ -11,5 +11,6 @@ build/
 dist/
 *.egg-info/
 
-#Data folder
+#Data and results folder
 data/
+results/

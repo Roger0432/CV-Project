@@ -1,4 +1,12 @@
 import os
+import sys
+
+# Add project root to sys.path to resolve imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
 import cv2
 import numpy as np
 from tqdm import tqdm
@@ -12,6 +20,7 @@ from src.tracking import TrafficTracker
 from src.lane_assignment import LaneAssigner
 from src.anomaly_detection import AnomalyDetector
 from src.evaluation import Evaluator
+from src.stabilization import VideoStabilizer
 
 def main():
     print("🚦 Starting Traffic Analysis System...")
@@ -42,6 +51,7 @@ def main():
     lane_assigner = LaneAssigner(config.LANE_POLYGONS)
     anomaly_detector = AnomalyDetector()
     evaluator = Evaluator() # If ground truth is available
+    stabilizer = VideoStabilizer()
     
     video_writer = visualization.setup_video_writer(config.OUTPUT_VIDEO_PATH, width, height, int(fps))
 
@@ -58,6 +68,9 @@ def main():
         if not ret:
             break
 
+        # S. Stabilization
+        frame = stabilizer.stabilize(frame)
+
         # A. Detection
         detections = detector.detect(frame)
 
@@ -68,11 +81,11 @@ def main():
         lane_assignments = lane_assigner.assign(tracked_detections)
 
         # D. Anomaly Detection
-        frame_anomalies = anomaly_detector.analyze(tracked_detections, lane_assignments)
+        frame_anomalies, current_speeds = anomaly_detector.analyze(tracked_detections, lane_assignments)
         detected_anomalies.extend(frame_anomalies)
         
         # Update Evaluation Stats
-        evaluator.update(tracked_detections, frame_anomalies)
+        evaluator.update(tracked_detections, frame_anomalies, frame_idx, current_speeds)
 
         # E. Visualization
         annotated_frame = visualization.draw_frame(frame, tracked_detections, lane_assignments, frame_anomalies)

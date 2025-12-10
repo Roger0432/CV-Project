@@ -80,38 +80,53 @@ class AnomalyDetector:
                         'value': f"Zone {zone_id}",
                         'bbox': bbox
                     })
-            
-        return anomalies
+        
+        current_speeds = {tid: self._calculate_speed(tid) for tid in detections.tracker_id} if detections.tracker_id is not None else {}
+        return anomalies, current_speeds
 
     def _calculate_speed(self, tid):
         """
-        Calculates speed in km/h based on pixel displacement or homography.
+        Calculates speed in km/h based on regression over history.
         """
         history = self.track_history[tid]
-        if len(history) < 2:
+        if len(history) < config.SPEED_HISTORY_WINDOW // 2: # Wait for at least half window
             return 0.0
         
-        start_pos = np.array(history[0])
-        end_pos = np.array(history[-1])
+        # Convert history dequqe to list of points
+        points = np.array(history)
         
+        # Map to World Coordinates
         if config.HOMOGRAPHY_MATRIX is not None:
-            # Convert pixels to world coordinates
-            start_world = self._apply_homography(start_pos, config.HOMOGRAPHY_MATRIX)
-            end_world = self._apply_homography(end_pos, config.HOMOGRAPHY_MATRIX)
-            meters_dist = np.linalg.norm(end_world - start_world)
+            world_points = np.array([self._apply_homography(p, config.HOMOGRAPHY_MATRIX) for p in points])
         else:
-            # Fallback: simple Scaling
-            pixel_dist = np.linalg.norm(end_pos - start_pos)
-            meters_dist = pixel_dist * config.CAMERA_CALIBRATION_FACTOR
+            # Simple scaling assumption (less accurate)
+            # Center everything at 0,0 to avoid huge numbers
+            world_points = points * config.CAMERA_CALIBRATION_FACTOR
+            
+        # We need to regress Distance vs Time.
+        # Since vehicles move in 2D, we can approximate "distance traveled" 
+        # as distance from the FIRST point in the window (assuming relatively straight motion in short window)
+        # OR proper cumulative distance.
+        # "Displacement from start of window" is robust enough for 0.5s windows.
         
-        # Time elapsed
-        frames_elapsed = len(history) - 1
-        if frames_elapsed == 0:
+        start_point = world_points[0]
+        distances = np.linalg.norm(world_points - start_point, axis=1) # [0, d1, d2, ...]
+        
+        # Time points (seconds)
+        # 0, 1/FPS, 2/FPS...
+        num_points = len(distances)
+        times = np.arange(num_points) / config.FPS
+        
+        # Linear Regression: Distance = Speed * Time + c
+        # Use np.polyfit(times, distances, 1) -> Returns [slope, intercept]
+        # slope is Speed in meters/second
+        
+        if num_points < 2:
             return 0.0
+            
+        slope, intercept = np.polyfit(times, distances, 1)
         
-        time_seconds = frames_elapsed / config.FPS
-        
-        speed_mps = meters_dist / time_seconds
+        speed_mps = abs(slope) # Speed is magnitude
         speed_kmh = speed_mps * 3.6
         
         return speed_kmh
