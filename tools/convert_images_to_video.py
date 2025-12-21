@@ -42,7 +42,8 @@ if __name__ == "__main__":
     parser.add_argument("input_folder", help="Path to the folder containing images")
     parser.add_argument("output_file", help="Path for the output video (e.g., data/video.mp4)")
     parser.add_argument("--fps", type=int, default=25, help="Frame rate (default: 25)")
-    
+    #python tools/convert_images_to_video.py /path/to/your/images /path/to/your/video.mp4 --fps 30
+
     args = parser.parse_args()
     
     convert_images_to_video(args.input_folder, args.output_file, args.fps)

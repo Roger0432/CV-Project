@@ -4,9 +4,9 @@ import os
 # --- PATHS ---
 DATA_DIR = "data"
 RESULTS_DIR = "results"
-VIDEO_FILENAME = "input_video_2.mp4" # Default filename, can be overridden
+VIDEO_FILENAME = "input_video.mp4" # Default filename, can be overridden
 VIDEO_PATH = os.path.join(DATA_DIR, VIDEO_FILENAME)
-OUTPUT_VIDEO_PATH = os.path.join(RESULTS_DIR, "output_video.mp4")
+OUTPUT_VIDEO_PATH = os.path.join(RESULTS_DIR, "output_video_2.mp4")
 TRACKING_RESULTS_PATH = os.path.join(RESULTS_DIR, "tracking_results.json")
 ANOMALY_RESULTS_PATH = os.path.join(RESULTS_DIR, "anomaly_detection.csv")
 LANE_ACCURACY_PATH = os.path.join(RESULTS_DIR, "lane_accuracy.csv")
@@ -38,12 +38,12 @@ TRACK_BUFFER = 30 # Number of frames to keep lost tracks
 # coordinates must be adjusted to the video resolution (e.g., 1920x1080).
 # Example polygons (dummy values, user needs to update):
 LANE_POLYGONS = {
-    1: np.array([[596, 538], [957, 340], [956, 537], [598, 538]]),
-    2: np.array([[592, 537], [248, 474], [957, 202], [957, 336], [595, 538]]),
-    3: np.array([[245, 476], [38, 523], [32, 380], [957, 134], [956, 196], [244, 475]]),
-    4: np.array([[34, 346], [37, 256], [324, 195], [955, 84], [958, 120], [35, 348]]),
-    5: np.array([[34, 253], [32, 185], [957, 50], [957, 84], [36, 254]]),
-    6: np.array([[33, 182], [34, 138], [957, 34], [957, 49], [38, 183]]),
+    1: np.array([[315, 539], [537, 539], [539, 20], [530, 20], [315, 536]]),
+    2: np.array([[543, 537], [771, 537], [555, 23], [540, 23], [543, 537]]),
+    3: np.array([[779, 537], [957, 537], [959, 484], [574, 22], [558, 24], [779, 537]]),
+    4: np.array([[957, 420], [578, 21], [585, 23], [958, 288], [957, 421]]),
+    5: np.array([[958, 287], [959, 224], [597, 21], [587, 22], [958, 287]]),
+    6: np.array([[957, 219], [957, 174], [616, 18], [603, 21], [958, 224]]),
 }
 
 LANE_NAMES = {
@@ -69,9 +69,9 @@ FORBIDDEN_ZONES = {
 # Homography Matrix (3x3) for Pixel -> Real World mapping
 # If None, uses calibration factor
 HOMOGRAPHY_MATRIX = np.array([
-    [0.008124953821323276, 0.05481119641368877, -10.494828744849963],
-    [-0.051780583972130666, 0.0011506796438285952, 49.535895656938564],
-    [-0.0004874699437742386, -2.9819345501108934e-05, 1.0],
+    [0.234230834218914, 0.08802305234978285, -125.02667542891139],
+    [-0.006040920941760074, 0.3342642921107224, -100.0074461908375],
+    [-0.0004620286965838227, 0.024722955400739113, 1.0],
 ])
 
 # --- VISUALIZATION ---
