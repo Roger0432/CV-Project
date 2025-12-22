@@ -2,7 +2,7 @@
 
 This project implements a complete computer vision system for traffic analysis at intersections using state-of-the-art models.
 
-## 🏗️ Architecture
+##  Architecture
 
 - **Detection**: YOLOv8 (detects vehicles and pedestrians).
 - **Tracking**: ByteTrack (associates detections temporally).
@@ -12,7 +12,7 @@ This project implements a complete computer vision system for traffic analysis a
     - Unusual trajectories (clustering).
     - Pedestrians on the road.
 
-## 🚀 Installation
+##  Installation
 
 1.  Clone the repository:
     ```bash
@@ -34,7 +34,7 @@ This project implements a complete computer vision system for traffic analysis a
 
 4.  Download a video from the UA-DETRAC dataset (or use your own) and save it to the `data/` folder.
 
-## ⚙️ Configuration
+##  Configuration
 
 You can adjust the system parameters in `utils/config.py`:
 - **Paths**: Set `VIDEO_PATH` for input and `GROUND_TRUTH_PATH` for XML annotations (UA-DETRAC format).
@@ -48,29 +48,47 @@ You can adjust the system parameters in `utils/config.py`:
 
 ## ▶️ Execution
 
-To run the complete analysis pipeline:
+Follow these steps to run the complete workflow:
 
+### 1. Prepare Video
+Convert the sequence of images from the dataset into a video file:
 ```bash
-# Ensure you are in the project root directory
-python src/main.py
+python tools/convert_images_to_video.py ./data/ua-detrac-orig/DETRAC-Images/DETRAC-Images/MVI_20061 ./data/input_video.mp4 --fps 25
 ```
 
-The script will:
-1. Detect and track vehicles using YOLOv8 + ByteTrack.
-2. Assign vehicles to lanes based on geometry.
-3. Estimate speeds (using Homography or Scale).
-4. Detect anomalies (Speeding, Wrong Direction, Forbidden Zones).
-5. Compare with Ground Truth (if configured).
+### 2. Define Lanes
+Draw polygons on the video to define the traffic lanes manually (this helps update coordinates for `config.py`):
+```bash
+python tools/draw_lanes.py --video data/input_video.mp4
+```
 
-## 📊 Results
+### 3. Calibrate Camera
+Compute the pixel-to-meter scale for accurate speed estimation:
+```bash
+python tools/calibrate_camera.py --video data/input_video.mp4
+```
+
+### 4. Run Traffic Analysis
+Execute the main system to perform detection, tracking, lane assignment, and anomaly detection:
+```bash
+python src/main.py
+```
+This script performs:
+- **Stabilization**: Fixes small camera movements.
+- **Detection & Tracking**: Identifies and follows vehicles.
+- **Lane Assignment**: Maps vehicles to the defined lanes.
+- **Anomaly Detection**: Flags speeding, wrong-way driving, and forbidden zone entries.
+- **Evaluation**: Compares results with Ground Truth (if available).
+
+##  Results
 
 Results will be saved to the `results/` folder:
-- **`output_video_2.mp4`**: Processed video with visualizations.
+- **`output_video.mp4`**: Processed video with visualizations.
 - **`tracking_results.json`**: Full history of tracked objects and their positions.
 - **`anomaly_detection.csv`**: List of all detected anomalies with timestamps and values.
 - **`lane_accuracy.csv`**: Evaluation metrics for lane assignment (if GT is available).
 
-## 🛠️ Directory Structure
+##  Directory Structure
 
 ```
 CV-Project/
