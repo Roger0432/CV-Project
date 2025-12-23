@@ -63,7 +63,9 @@ class AnomalyDetector:
             current_lane = lane_assignments.get(tid, {}).get('current_lane')
             avg_lane_speed = self._get_lane_avg_speed(current_lane)
             
-            if avg_lane_speed > 0 and speed_kmh > 1.3 * avg_lane_speed:
+            # Only apply relative check if the car is moving significantly (e.g. > 30km/h)
+            # This prevents flagging slow cars just because the average is also very slow.
+            if avg_lane_speed > 0 and speed_kmh > 30 and speed_kmh > 1.3 * avg_lane_speed:
                 is_speeding = True
                 strength = max(strength, speed_kmh) # Keep the speed value
             
@@ -116,18 +118,20 @@ class AnomalyDetector:
                     self._update_lane_stats(current_lane, vector=motion_vector)
                     
                     # Check against dominant flow
-                    dominant_vector = self._get_lane_dominant_vector(current_lane)
-                    if dominant_vector is not None:
-                        # Cosine similarity
-                        dot_prod = np.dot(motion_vector, dominant_vector)
-                        # cos(150 deg) approx -0.866
-                        if dot_prod < -0.86: 
-                            anomalies.append({
-                                'type': 'WRONG_DIRECTION',
-                                'id': tid,
-                                'value': f"Lane {current_lane}",
-                                'bbox': bbox
-                            })
+                    # Warm-up: Only check if we have enough samples to be sure of the direction
+                    if len(self.lane_stats[current_lane]['vectors']) > 20: 
+                        dominant_vector = self._get_lane_dominant_vector(current_lane)
+                        if dominant_vector is not None:
+                            # Cosine similarity
+                            dot_prod = np.dot(motion_vector, dominant_vector)
+                            # cos(150 deg) approx -0.866
+                            if dot_prod < -0.86: 
+                                anomalies.append({
+                                    'type': 'WRONG_DIRECTION',
+                                    'id': tid,
+                                    'value': f"Lane {current_lane}",
+                                    'bbox': bbox
+                                })
 
         
         current_speeds = {tid: self._calculate_speed(tid) for tid in detections.tracker_id} if detections.tracker_id is not None else {}

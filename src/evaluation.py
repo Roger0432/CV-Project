@@ -16,6 +16,7 @@ class Evaluator:
         self.total_frames = 0
         self.total_tracks = set()
         self.anomalies_counts = collections.defaultdict(int)
+        self.unique_anomalies = set() # Store (id, type) tuples
         
         # Ground Truth Data: {frame_idx: {gt_id: {'bbox': [x1, y1, x2, y2], 'speed': float, 'center': (x, y)}}}
         self.ground_truth = {}
@@ -83,8 +84,14 @@ class Evaluator:
             for tid in detections.tracker_id:
                 self.total_tracks.add(tid)
         
+        if self.unique_anomalies is None:
+            self.unique_anomalies = set()
+
         for anomaly in frame_anomalies:
-            self.anomalies_counts[anomaly['type']] += 1
+            unique_key = (anomaly['id'], anomaly['type'])
+            if unique_key not in self.unique_anomalies:
+                self.unique_anomalies.add(unique_key)
+                self.anomalies_counts[anomaly['type']] += 1
 
         # Compare with Ground Truth if available and frame_idx provided
         if self.ground_truth and frame_idx is not None:
@@ -139,8 +146,16 @@ class Evaluator:
         print(f"Total Frames Processed: {self.total_frames}")
         print(f"Total Unique Tracks: {self.total_tracks}")
         print(f"Total Anomalies Detected: {sum(self.anomalies_counts.values())}")
-        for k, v in self.anomalies_counts.items():
+        print(f"Total Anomalies Detected: {sum(self.anomalies_counts.values())}")
+        
+        known_anomalies = ['SPEEDING', 'WRONG_DIRECTION', 'FORBIDDEN_ZONE', 'PEDESTRIAN_IN_ROAD']
+        for k in known_anomalies:
+            v = self.anomalies_counts.get(k, 0)
             print(f"  - {k}: {v}")
+            
+        for k, v in self.anomalies_counts.items():
+            if k not in known_anomalies:
+                print(f"  - {k}: {v}")
             
         if self.centroid_errors:
             avg_centroid_error = np.mean(self.centroid_errors)

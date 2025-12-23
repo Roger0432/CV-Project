@@ -9,30 +9,45 @@ This project implements a complete computer vision system for traffic analysis a
 - **Lane Assignment**: Virtual lanes defined by polygons and geometry-based assignment.
 - **Anomaly Detection**:
     - Speeding.
-    - Unusual trajectories (clustering).
     - Pedestrians on the road.
+    - Forbidden zones.
+    - Wrong-way driving.
 
 ##  Installation
 
 1.  Clone the repository:
-    ```bash
+    ```console
     git clone https://github.com/Roger0432/CV-Project.git
     cd CV-Project
     ```
 
-2.  Create a virtual environment (optional but recommended):
-    ```bash
-    python -m venv venv
-    .\venv\Scripts\activate  # Windows
-    # source venv/bin/activate # Linux/Mac
+2.  Create necessary directories (not included in the repository):
+    ```console
+    mkdir data
+    mkdir results
     ```
 
-3.  Install dependencies:
+3.  Create a virtual environment (optional but recommended):
+    ```console
+    python -m venv venv
+    ```
+
+    **Windows:**
+    ```powershell
+    .\venv\Scripts\activate
+    ```
+
+    **Linux/Mac:**
     ```bash
+    source venv/bin/activate
+    ```
+
+4.  Install dependencies:
+    ```console
     pip install -r requirements.txt
     ```
 
-4.  Download a video from the UA-DETRAC dataset (or use your own) and save it to the `data/` folder.
+5.  Download a video from the UA-DETRAC dataset (or use your own) and save it to the `data/` folder.
 
 ##  Configuration
 
@@ -62,13 +77,20 @@ Draw polygons on the video to define the traffic lanes manually (this helps upda
 python tools/draw_lanes.py --video data/input_video.mp4
 ```
 
-### 3. Calibrate Camera
+### 3. Define Forbidden Zones
+Interactively draw polygons for forbidden areas (e.g., sidewalks, islands) and get the code snippet:
+```bash
+python tools/draw_zones.py --video data/input_video.mp4
+```
+Copy the output into `utils/config.py`.
+
+### 4. Calibrate Camera
 Compute the pixel-to-meter scale for accurate speed estimation:
 ```bash
 python tools/calibrate_camera.py --video data/input_video.mp4
 ```
 
-### 4. Run Traffic Analysis
+### 5. Run Traffic Analysis
 Execute the main system to perform detection, tracking, lane assignment, and anomaly detection:
 ```bash
 python src/main.py

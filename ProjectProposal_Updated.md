@@ -1,7 +1,5 @@
 # Project Proposal Updates
 
-A continuació es presenten les seccions actualitzades per al document "ProjectProposal_Team_xmartia00.pdf", incorporant el feedback del professor Michal Hradiš.
-
 ## 3.2.3 Speed Estimation
 
 We propose a single robust method for speed estimation using homography transformation (Plan A), discarding the relative speed approach due to its dependency on unknown variables.
@@ -31,11 +29,11 @@ We define "Fast" cars based on both relative statistics and absolute safety limi
 
 We focus on detecting three specific types of traffic violations using trajectory analysis.
 
-**Dataset Specification:**
-To ensure a concrete evaluation protocol, we define our test set as follows:
+**Dataset Specification (Target):**
+To ensure a concrete evaluation protocol, we **aim to construct** our test set as follows:
 -   **Volume:** 10 video clips (10-20 seconds each).
 -   **Total Trajectories:** Approximately 150 total vehicle trajectories.
--   **Anomalies:** The dataset contains exactly **35 anomalous trajectories**, distributed as (approx. 3-4 per clip).
+-   **Anomalies:** The dataset **should contain approximately** **35 anomalous trajectories**, distributed as (approx. 3-4 per clip).
 
 **Anomaly Definitions & Detection Logic:**
 1.  **Wrong Direction (15 cases):**
