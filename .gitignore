@@ -14,3 +14,4 @@ dist/
 #Data and results folder
 data/
 results/
+yolov8n.pt
