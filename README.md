@@ -48,6 +48,18 @@ This project implements a complete computer vision system for traffic analysis a
     ```
 
 5.  Download a video from the UA-DETRAC dataset (or use your own) and save it to the `data/` folder.
+    
+    To download the official UA-DETRAC training dataset (images and annotations) via command line (using Kaggle):
+
+    ```bash
+    pip install kaggle
+    
+    # Navigate to the data directory (created in step 2)
+    cd data
+    
+    # Download and unzip the dataset
+    kaggle datasets download dtrnngc/ua-detrac-dataset --unzip
+    ```
 
 ##  Configuration
 

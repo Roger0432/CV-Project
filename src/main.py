@@ -29,7 +29,7 @@ def main():
     if not os.path.exists(config.VIDEO_PATH):
         print(f"❌ Error: Video file not found at {config.VIDEO_PATH}")
         print("Please place a video file in the 'data' directory and update config.py if necessary.")
-        # Create data dir if not exists (although I created it earlier)
+        # Create data dir if not exists
         os.makedirs(config.DATA_DIR, exist_ok=True)
         return
 
@@ -99,8 +99,7 @@ def main():
 
         pbar.update(1)
         frame_idx += 1
-        # if frame_idx > 100: # Limit for testing purposes, remove later
-        #     break
+
 
     cap.release()
     video_writer.release()

@@ -146,7 +146,6 @@ class Evaluator:
         print(f"Total Frames Processed: {self.total_frames}")
         print(f"Total Unique Tracks: {self.total_tracks}")
         print(f"Total Anomalies Detected: {sum(self.anomalies_counts.values())}")
-        print(f"Total Anomalies Detected: {sum(self.anomalies_counts.values())}")
         
         known_anomalies = ['SPEEDING', 'WRONG_DIRECTION', 'FORBIDDEN_ZONE', 'PEDESTRIAN_IN_ROAD']
         for k in known_anomalies:

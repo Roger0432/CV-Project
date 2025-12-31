@@ -58,14 +58,7 @@ class VideoStabilizer:
             return frame
 
         # 4. Estimate Affine Transformation (Translation + Rotation + Scale)
-        # We want Matrix M that maps Current -> Reference (to warp Current back to Reference alignment)
-        # Actually estimateAffinePartial2D finds Ref -> Curr, so we invert it or wrap properly
-        # We want to warp 'frame' so it matches 'ref_gray'.
-        # So we need coordinates in 'frame' to map to coordinates in 'ref_gray'.
-        # warpAffine uses the inverse mapping implicitly or forward?
-        # cv2.warpAffine(src, M, dsize) -> dst(x,y) = src(M*(x,y,1))
-        # Typically estimateRigidTransform or estimateAffine2D finds src -> dst.
-        # We want to transform Current (src) to Reference (dst).
+        # We want Matrix M that maps Current (src) to Reference (dst).
         
         # transform_matrix, inliers = cv2.estimateAffinePartial2D(valid_curr, valid_ref) # src=curr, dst=ref
         transform_matrix, inliers = cv2.estimateAffinePartial2D(valid_curr, valid_ref)
